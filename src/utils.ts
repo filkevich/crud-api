@@ -1,5 +1,5 @@
 import { parse } from 'url'
-import { TCustomParseUrlFn } from './interfaces'
+import { TCustomParseUrlFn, TRemoveTralingSlashFn } from './types'
 
 export const customParseUrlFn: TCustomParseUrlFn = async (url) => {
   const { pathname } = parse(url || '', true)
@@ -13,4 +13,10 @@ export const customParseUrlFn: TCustomParseUrlFn = async (url) => {
   }
 
   return { path: pathname || '', id: null}
+}
+
+export const removeTrailingSlash: TRemoveTralingSlashFn = async (url) => {
+  const hasTrailingSlash = url?.endsWith('/')
+
+  return hasTrailingSlash ? url?.slice(0, -1) : url
 }

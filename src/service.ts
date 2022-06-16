@@ -1,4 +1,4 @@
-import { TUser, TId } from './interfaces'
+import { TUser, TId } from './types'
 
 const users: TUser[] = [
   {

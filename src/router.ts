@@ -1,5 +1,5 @@
 import Service from './service'
-import { TRoutes } from './interfaces'
+import { TRoutes } from './types'
 
 const DEFAULT_HEADER = { 'content-type': 'application/json' }
 
@@ -12,10 +12,10 @@ const routes: TRoutes = {
     return res.end()
   },
 
-  '/api/users/id:get': async (res) => {
+  '/api/users/id:get': async (res, id) => {
 
     res.writeHead(200, DEFAULT_HEADER)
-    res.write(JSON.stringify({message: 'user by id'}))
+    res.write(JSON.stringify({message: `Get user by id: ${id}`}))
     return res.end()
   },
 
