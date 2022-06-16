@@ -1,11 +1,12 @@
-import { customParseUrlFn } from './utils'
+import { customParseUrlFn, removeTrailingSlash } from './utils'
 import routes from './router'
 
 import { TRequestHandlerFn } from './types'
 
 const requestHandler: TRequestHandlerFn = async (req, res) => {
   const { method, url } = req
-  const { path, id } = await customParseUrlFn(url)
+  const trimmedUrl = await removeTrailingSlash(url)
+  const { path, id } = await customParseUrlFn(trimmedUrl)
 
   const key = `${path}:${method?.toLowerCase()}`
   const chosenRoute = routes[key] || routes.default

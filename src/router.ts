@@ -13,13 +13,28 @@ const routes: TRoutes = {
   },
 
   '/api/users/id:get': async (res, id) => {
+    if (typeof id === 'string') {
+      const userById = await Service.getUserById(id)
 
-    res.writeHead(200, DEFAULT_HEADER)
-    res.write(JSON.stringify({message: `Get user by id: ${id}`}))
+      if (userById) {
+        res.writeHead(200, DEFAULT_HEADER)
+        res.write(JSON.stringify({ data: userById }))
+      }
+      else {
+        res.writeHead(404, DEFAULT_HEADER)
+        res.write(JSON.stringify({ message: `User with ID ${id} doesn't exits` }))
+      }
+    }
+    else {
+      res.writeHead(400, DEFAULT_HEADER)
+      res.write(JSON.stringify({ message: 'The ID is not valid' }))
+    }
+
+
     return res.end()
   },
 
-  default: async (res) => {
+  'default': async (res) => {
     const message = { message: 'There is no such endpoint' }
     const json = JSON.stringify(message)
 

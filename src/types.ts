@@ -3,7 +3,7 @@ import { IncomingMessage, ServerResponse } from 'http'
 export type TId = string | null
 export type TUrl = string | undefined
 export type TUser = {
-  id: number,
+  id: string,
   username: string,
   age: number,
   hobbies: string[]
