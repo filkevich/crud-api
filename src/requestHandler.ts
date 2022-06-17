@@ -11,7 +11,8 @@ const requestHandler: TRequestHandlerFn = async (req, res) => {
   const key = `${path}:${method?.toLowerCase()}`
   const chosenRoute = routes[key] || routes.default
 
-  return await chosenRoute(res, id)
+  const routeProps = { res, req, id }
+  return await chosenRoute(routeProps)
 }
 
 export default requestHandler

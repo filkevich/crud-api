@@ -12,9 +12,15 @@ export type TUser = {
 export type TRequestHandlerFn = (req: IncomingMessage, res: ServerResponse) => Promise<ServerResponse>
 export type TRemoveTralingSlashFn = (url: TUrl) => Promise<TUrl>
 export type TCustomParseUrlFn = (url: TUrl) => Promise<{ path: string, id: TId }>
-export type TRouteFn = (res: ServerResponse, id: TId) => Promise<ServerResponse>
 
-export type TRoutes = {
-  [key: string]: TRouteFn
+export type TRouteProps = {
+  req: IncomingMessage,
+  res: ServerResponse,
+  id: TId,
 }
 
+export type TRoute = (props: TRouteProps) => Promise<ServerResponse>
+
+export type TRoutes = {
+  [key: string]: TRoute
+}
