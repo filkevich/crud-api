@@ -1,16 +1,9 @@
 import { IncomingMessage } from 'http'
-import { v4 as uuidv4 } from 'uuid'
+import { v4 as uuidv4, validate } from 'uuid'
 import { TUser, TId, TValidateConfig } from './types'
 import { getBodyFromReq, validateData } from './utils'
 
-const users: Array<TUser> = [
-  {
-    id: '10',
-    username: 'Artiom',
-    age: 26,
-    hobbies: ['music', 'coding']
-  }
-]
+const users: Array<TUser> = []
 
 export default class Service {
   static async getUsers() {
@@ -23,7 +16,23 @@ export default class Service {
   }
 
   static async getUserById(id: TId) {
-    // !VALIDATION
+    if (typeof id !== 'string') {
+      return {
+        success: false,
+        data: null,
+        errMsg: `Wrong type of id. Expected string instead of ${typeof id}.`,
+        code: 400
+      }
+    }
+
+    if (!validate(id)) {
+      return {
+        success: false,
+        data: null,
+        errMsg: `Wrong format of id. Expected uuid format.`,
+        code: 400
+      }
+    }
 
     for (let user of users) {
       if (user.id === id) {
@@ -45,13 +54,13 @@ export default class Service {
   }
 
   static async createUser(req: IncomingMessage) {
-    const {success, data, errMsg } = await getBodyFromReq(req)
+    const {success: isGetBodySuccess, data, errMsg } = await getBodyFromReq(req)
 
-    if (!success) {
+    if (!isGetBodySuccess) {
       return {
         code: 400,
-        success,
-        data,
+        success: false,
+        data: null,
         errMsg
       }
     }
@@ -77,7 +86,7 @@ export default class Service {
       return {
         code: 400,
         success: false,
-        data,
+        data: null,
         validateErrMsg
       }
     }
@@ -89,6 +98,6 @@ export default class Service {
 
     users.push(newUser)
 
-    return { code: 200, success: true, data: newUser, errMsg: null }
+    return { code: 201, success: true, data: newUser, errMsg: null }
   }
 }
