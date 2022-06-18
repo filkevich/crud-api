@@ -1,6 +1,7 @@
 import { IncomingMessage } from 'http'
-import { Stream } from 'stream'
-import { TUser } from './types'
+import { v4 as uuidv4 } from 'uuid'
+import { TUser, TId, TValidateConfig } from './types'
+import { getBodyFromReq, validateData } from './utils'
 
 const users: Array<TUser> = [
   {
@@ -13,33 +14,81 @@ const users: Array<TUser> = [
 
 export default class Service {
   static async getUsers() {
-
-    return users
+    return {
+      success: true,
+      data: users,
+      errMsg: null,
+      code: 200
+    }
   }
 
-  static async getUserById(id: string) {
+  static async getUserById(id: TId) {
+    // !VALIDATION
+
     for (let user of users) {
       if (user.id === id) {
-
-        return user
+        return {
+          success: true,
+          data: user,
+          errMsg: null,
+          code: 200
+        }
       }
     }
 
-    return null
+    return {
+      success: false,
+      data: null,
+      errMsg: 'There is no user with such ID.',
+      code: 404
+    }
   }
 
   static async createUser(req: IncomingMessage) {
-    let buffer = [] as Buffer[] || []
-    let body = ''
+    const {success, data, errMsg } = await getBodyFromReq(req)
 
-    req.on('data', chunk => {
-      console.log(chunk)
-      buffer.push(chunk)
-    })
-    req.on('end', () => {body = Buffer.concat(buffer).toString()})
+    if (!success) {
+      return {
+        code: 400,
+        success,
+        data,
+        errMsg
+      }
+    }
 
-    console.log(buffer)
+    const validateConfig = {
+      username: {
+        isRequired: true,
+        type: 'string'
+      },
+      age: {
+        isRequired: true,
+        type: 'number'
+      },
+      hobbies: {
+        isRequired: true,
+        type: 'array'
+      }
+    } as TValidateConfig
 
-    return null
+    const { isValid, validateErrMsg } = await validateData(data, validateConfig)
+
+    if (!isValid) {
+      return {
+        code: 400,
+        success: false,
+        data,
+        validateErrMsg
+      }
+    }
+
+    const newUser = {
+      id: uuidv4(),
+      ...data
+    }
+
+    users.push(newUser)
+
+    return { code: 200, success: true, data: newUser, errMsg: null }
   }
 }
