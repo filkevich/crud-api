@@ -1,11 +1,16 @@
 import { parse } from 'url'
+import { validate } from 'uuid'
 import {
   TCustomParseUrlFn,
   TRemoveTralingSlashFn,
   TGetBodyFromReqFn,
   TParsedBody,
   TSend,
-  TValidateBody
+  TValidateBody,
+  TId,
+  TUserUpdate,
+  TUser,
+  TValidatePutBody
 } from './types'
 
 export const customParseUrl: TCustomParseUrlFn = async (url) => {
@@ -102,6 +107,43 @@ export const validateData: TValidateBody = async (body, config) => {
       return {
         isValid: false,
         validateErrMsg: `The property '${prop}' has wrong type. Expected ${expectedType} instead of ${propType}.`
+      }
+    }
+  }
+
+  return {
+    isValid: true,
+    validateErrMsg: null
+  }
+}
+
+export const validateId = async (id: TId): Promise<boolean> => {
+  if (typeof id !== 'string') {
+    return false
+  }
+
+  if (!validate(id)) {
+    return false
+  }
+
+  return true
+}
+
+export const validatePutBody:TValidatePutBody = async (userById, userFromReq) => {
+  for (const prop in userFromReq) {
+    if (!userById?.hasOwnProperty(prop)) {
+
+      return {
+        isValid: false,
+        validateErrMsg: `The property '${prop}' doesn't exist.`
+      }
+    }
+
+    if (typeof userFromReq[prop] !== typeof userById[prop]) {
+
+      return {
+        isValid: false,
+        validateErrMsg: `Wrong value type of the property '${prop}'.`
       }
     }
   }

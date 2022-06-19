@@ -2,11 +2,15 @@ import { IncomingMessage, ServerResponse } from 'http'
 
 export type TId = string | undefined
 export type TUrl = string | undefined
+
 export type TUser = {
   id: string,
   username: string,
   age: number,
   hobbies: string[]
+}
+export type TUserUpdate = {
+  [key: string]: string | number | string[]
 }
 
 export type TRequestHandlerFn = (req: IncomingMessage, res: ServerResponse) => Promise<void>
@@ -46,3 +50,5 @@ export type TValidateConfig = {
 }
 
 export type TValidateBody = (body: any, config: TValidateConfig) => Promise<TIsValid>
+
+export type TValidatePutBody = (userById: TUserUpdate, userFromReq: TUserUpdate) => Promise<TIsValid>

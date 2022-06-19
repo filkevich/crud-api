@@ -13,8 +13,13 @@ const routes: TRoutes = {
     send(code, answer, res)
   },
 
-  '/api/users:post': async ({ res, req })  => {
+  '/api/users:post': async ({ res, req }) => {
     const { code, ...answer } = await Service.createUser(req)
+    send(code, answer, res)
+  },
+
+  '/api/users/id:put': async ({ res, req, id }) => {
+    const { code, ...answer } = await Service.updateUser(req, id)
     send(code, answer, res)
   },
 
