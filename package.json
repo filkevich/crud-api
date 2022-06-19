@@ -6,7 +6,7 @@
   "type": "commonjs",
   "scripts": {
     "start:dev": "nodemon",
-    "start:prod": "npm run build && node ./dist/index.js",
+    "start:prod": "npm run build && node ./dist/app.js",
     "build": "tsc"
   },
   "repository": {
