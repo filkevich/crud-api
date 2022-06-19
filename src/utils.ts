@@ -36,7 +36,7 @@ export const removeTrailingSlash: TRemoveTralingSlashFn = async (url) => {
 export const getBodyFromReq: TGetBodyFromReqFn = async (req) => {
   let arr = [] as Buffer[]
 
-  const body = await new Promise((resolve, reject) => {
+  const body = await new Promise(resolve => {
     req.on('data', (chunk) => { arr.push(chunk) })
     req.on('end', () => {
       try {

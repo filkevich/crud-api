@@ -5,6 +5,20 @@ import { getBodyFromReq, validateData, validateId, validatePutBody } from './uti
 
 let users: Array<TUser> = []
 
+const wrongIdType = {
+  success: false,
+  data: null,
+  errMsg: `The ID has wrong format. Expected UUID`,
+  code: 400
+}
+
+const noUserWithSuchId = {
+  success: false,
+  data: null,
+  errMsg: 'There is no user with such ID.',
+  code: 404
+}
+
 export const getUsers = async () => {
   return {
     success: true,
@@ -18,12 +32,7 @@ export const getUserById = async (id: TId) => {
   const isIdValid = await validateId(id)
 
   if (!isIdValid) {
-    return {
-      success: false,
-      data: null,
-      errMsg: `The ID has wrong format. Expected UUID`,
-      code: 400
-    }
+    return wrongIdType
   }
 
   for (let user of users) {
@@ -37,12 +46,7 @@ export const getUserById = async (id: TId) => {
     }
   }
 
-  return {
-    success: false,
-    data: null,
-    errMsg: 'There is no user with such ID.',
-    code: 404
-  }
+  return noUserWithSuchId
 }
 
 export const createUser = async (req: IncomingMessage) => {
@@ -50,7 +54,7 @@ export const createUser = async (req: IncomingMessage) => {
 
   if (!isGetBodySuccess) {
     return {
-      code: 400,
+      code: 500,
       success: false,
       data: null,
       errMsg
@@ -90,34 +94,29 @@ export const createUser = async (req: IncomingMessage) => {
 
   users.push(newUser)
 
-  return { code: 201, success: true, data: newUser, errMsg: null }
+  return {
+    code: 201,
+    success: true,
+    data: newUser,
+    errMsg: null
+  }
 }
 
 export const updateUser = async (req: IncomingMessage, id: TId) => {
   const isIdValid = validateId(id)
 
-  if (!isIdValid) {
-    return {
-      success: false,
-      data: null,
-      errMsg: `The ID has wrong format. Expected UUID`,
-      code: 400
-    }
-  }
+  if (!isIdValid) { return wrongIdType }
 
   const userByIdData = await getUserById(id)
   const { success, data: userById } = userByIdData
 
-  if (!success || !userById) {
-
-    return userByIdData
-  }
+  if (!success || !userById) { return userByIdData }
 
   const { success: isGetBodySuccess, data: userFromReq, errMsg } = await getBodyFromReq(req)
 
   if (!isGetBodySuccess) {
     return {
-      code: 400,
+      code: 500,
       success: false,
       data: null,
       errMsg
@@ -155,5 +154,29 @@ export const updateUser = async (req: IncomingMessage, id: TId) => {
     success: true,
     data: userToSend,
     errMsg: null
+  }
+}
+
+export const deleteUser = async (id: TId) => {
+  const isIdValid = await validateId(id)
+
+  if (!isIdValid) { return wrongIdType }
+
+  let isIdExists = false
+  users.map(user => {
+    if (user.id === id) {
+      isIdExists = true
+    }
+  })
+
+  if (!isIdExists) { return noUserWithSuchId }
+
+  users = users.filter(user => !(user.id === id))
+
+  return {
+    code: 204,
+    success: true,
+    data: users,
+    errMsg: null,
   }
 }

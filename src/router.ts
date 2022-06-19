@@ -1,4 +1,4 @@
-import { getUsers, getUserById, createUser, updateUser } from './service'
+import { getUsers, getUserById, createUser, updateUser, deleteUser } from './service'
 import { TRoutes } from './types'
 import { send } from './utils'
 
@@ -20,6 +20,11 @@ const routes: TRoutes = {
 
   '/api/users/id:put': async ({ res, req, id }) => {
     const { code, ...answer } = await updateUser(req, id)
+    send(code, answer, res)
+  },
+
+  '/api/users/id:delete': async ({ res, id }) => {
+    const { code, ...answer } = await deleteUser(id)
     send(code, answer, res)
   },
 
